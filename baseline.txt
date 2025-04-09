@@ -1,0 +1,22 @@
+============================= test session starts ==============================
+platform linux -- Python 3.9.21, pytest-8.3.5, pluggy-1.5.0
+benchmark: 5.1.0 (defaults: timer=time.perf_counter disable_gc=False min_rounds=5 min_time=0.000005 max_time=1.0 calibration_precision=10 warmup=False warmup_iterations=100000)
+rootdir: /tests
+plugins: benchmark-5.1.0
+collected 2 items
+
+tests/test_fulltext.py .                                                 [ 50%]
+tests/test_scalar.py .                                                   [100%]
+
+
+----------------------------------------------------------------------------------- benchmark: 2 tests ----------------------------------------------------------------------------------
+Name (time in ms)            Min                Max               Mean            StdDev             Median               IQR            Outliers       OPS            Rounds  Iterations
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+test_price_range          2.5046 (1.0)       9.1973 (1.0)       5.6293 (1.0)      1.4895 (1.0)       5.8921 (1.0)      1.8570 (1.0)          32;0  177.6433 (1.0)         100           1
+test_fulltext_product     5.5927 (2.23)     18.3160 (1.99)     10.4340 (1.85)     2.5898 (1.74)     10.9765 (1.86)     3.2488 (1.75)         22;3   95.8401 (0.54)         81           1
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Legend:
+  Outliers: 1 Standard Deviation from Mean; 1.5 IQR (InterQuartile Range) from 1st Quartile and 3rd Quartile.
+  OPS: Operations Per Second, computed as 1 / Mean
+============================== 2 passed in 2.58s ===============================
