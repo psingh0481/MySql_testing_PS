@@ -1,0 +1,61 @@
+---
+- name: Provision MySQL schema and import data
+  hosts: localhost
+  connection: local
+  vars:
+    db_name: ecommerce
+    db_user: appuser
+    db_pass: "{{ lookup('env','MYSQL_PASSWORD') }}"
+    admin_user: "{{ lookup('env','MYSQL_ADMIN_USER') }}"
+    admin_pass: "{{ lookup('env','MYSQL_ADMIN_PASS') }}"
+    csv_dir: ./data
+  tasks:
+    - name: Install MySQL Python connector
+      pip:
+        name: mysql-connector-python
+
+    - name: Create database
+      mysql_db:
+        name: "{{ db_name }}"
+        state: present
+        login_host: 127.0.0.1
+        login_port: 3306
+        login_unix_socket: ""
+        login_user: "{{ admin_user }}"
+        login_password: "{{ admin_pass }}"
+
+    - name: Create application user
+      mysql_user:
+        name: "{{ db_user }}"
+        password: "{{ db_pass }}"
+        priv: "{{ db_name }}.*:ALL"
+        host: "%"
+        state: present
+        login_host: 127.0.0.1
+        login_port: 3306
+        login_unix_socket: ""
+        login_user: "{{ admin_user }}"
+        login_password: "{{ admin_pass }}"
+
+    - name: Import schema
+      mysql_db:
+        name: "{{ db_name }}"
+        state: import
+        target: ./schema.sql
+        login_host: 127.0.0.1
+        login_port: 3306
+        login_unix_socket: ""
+        login_user: "{{ admin_user }}"
+        login_password: "{{ admin_pass }}"
+
+    - name: Import orders CSV
+      shell: |
+        mysql --protocol=TCP --host=127.0.0.1 --port=3306 \
+          --user={{ admin_user }} --password="{{ admin_pass }}" {{ db_name }} \
+          -e "LOAD DATA LOCAL INFILE '{{ csv_dir }}/orders.csv'
+              INTO TABLE orders
+              FIELDS TERMINATED BY ',' ENCLOSED BY '\"'
+              LINES TERMINATED BY '\n'
+              IGNORE 1 LINES;"
+      args:
+        chdir: "{{ playbook_dir }}"
